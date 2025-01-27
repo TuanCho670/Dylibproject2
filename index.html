@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alert Image Loader</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            background: linear-gradient(145deg, #2a2a2a, #1f1f1f);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .title {
+            color: #00ff95;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(0,255,149,0.5);
+        }
+        .load-btn {
+            background: linear-gradient(145deg, #232323, #1c1c1c);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 4px 4px 8px #161616, 
+                       -4px -4px 8px #2a2a2a;
+            width: 200px;
+            margin: 10px auto;
+            display: block;
+        }
+        .load-btn:active {
+            box-shadow: inset 4px 4px 8px #161616, 
+                       inset -4px -4px 8px #2a2a2a;
+        }
+        .load-btn.active {
+            background: linear-gradient(145deg, #00cc78, #00995a);
+        }
+        .status {
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">Image Mod Loader</div>
+        <button class="load-btn" onclick="loadMod(this)">LOAD MOD</button>
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        let myAlert = null;
+        let isLoaded = false;
+
+        function setStatus(text) {
+            document.getElementById('status').textContent = text;
+        }
+
+        function loadMod(button) {
+            if (typeof h5gg === 'undefined') {
+                setStatus('H5GG không tìm thấy!');
+                return;
+            }
+
+            if (!isLoaded) {
+                try {
+                    h5gg.require(7.8);
+                    setStatus('Đang load plugin...');
+                    
+                    myAlert = h5gg.loadPlugin("MyAlert", "Alert.dylib");
+
+                    if (!myAlert) {
+                        setStatus("Không thể load plugin!");
+                        return;
+                    }
+
+                    button.classList.add('active');
+                    button.textContent = 'ĐÃ LOAD';
+                    setStatus('Mod đã được load thành công!');
+                    isLoaded = true;
+
+                } catch (e) {
+                    setStatus('Lỗi: ' + e.message);
+                    console.error(e);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
