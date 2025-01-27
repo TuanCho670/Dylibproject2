@@ -53,12 +53,8 @@
             font-size: 14px;
             min-height: 20px;
         }
-        .error {
-            color: #ff4444;
-        }
-        .success {
-            color: #00ff95;
-        }
+        .error { color: #ff4444; }
+        .success { color: #00ff95; }
     </style>
 </head>
 <body>
@@ -71,105 +67,53 @@
     <script>
         let myAlert = null;
         let isLoaded = false;
-        let retryCount = 0;
-        const MAX_RETRIES = 3;
 
         function setStatus(text, type = 'normal') {
             const statusEl = document.getElementById('status');
             statusEl.textContent = text;
-            
-            // Xóa các class cũ
-            statusEl.classList.remove('error', 'success');
-            
-            // Thêm class mới dựa vào type
-            if (type === 'error') {
-                statusEl.classList.add('error');
-            } else if (type === 'success') {
-                statusEl.classList.add('success');
-            }
+            statusEl.className = 'status ' + type;
         }
 
-        async function checkPluginLoad() {
-            return new Promise((resolve, reject) => {
-                if (myAlert && typeof myAlert.loadAndShowImages === 'function') {
-                    resolve(true);
-                } else {
-                    reject(new Error('Plugin không hoạt động đúng'));
-                }
-            });
-        }
-
-        async function initializePlugin() {
-            try {
-                // Kiểm tra môi trường h5gg
-                if (typeof h5gg === 'undefined') {
-                    throw new Error('H5GG không tìm thấy');
-                }
-
-                // Kiểm tra version
-                h5gg.require(7.8);
-                
-                // Load plugin
-                myAlert = h5gg.loadPlugin("MyAlert", "Alert.dylib");
-                
-                if (!myAlert) {
-                    throw new Error('Không thể load plugin');
-                }
-
-                // Kiểm tra plugin đã load đúng chưa
-                await checkPluginLoad();
-                
-                return true;
-            } catch (error) {
-                throw error;
-            }
-        }
-
-        async function loadMod(button) {
+        function loadMod(button) {
             if (isLoaded) {
                 setStatus('Mod đã được load rồi!', 'success');
                 return;
             }
 
-            button.disabled = true;
-            setStatus('Đang khởi tạo mod...', 'normal');
-
             try {
-                await initializePlugin();
+                // Kiểm tra h5gg
+                if (typeof h5gg === 'undefined') {
+                    throw new Error('H5GG không tìm thấy!');
+                }
+
+                // Kiểm tra version
+                h5gg.require(7.8);
+
+                // Load plugin
+                myAlert = h5gg.loadPlugin("MyAlert", "Alert.dylib");
                 
-                // Cập nhật UI
+                if (!myAlert) {
+                    throw new Error('Không thể load plugin!');
+                }
+
+                // Đánh dấu đã load thành công
                 button.classList.add('active');
                 button.textContent = 'ĐÃ LOAD';
-                setStatus('Mod đã được load thành công! Bạn có thể bắt đầu thay đổi ảnh.', 'success');
+                setStatus('Mod đã được load thành công!', 'success');
                 isLoaded = true;
 
             } catch (error) {
+                setStatus('Lỗi: ' + error.message, 'error');
                 console.error('Lỗi:', error);
-                
-                if (retryCount < MAX_RETRIES) {
-                    retryCount++;
-                    setStatus(`Lỗi: ${error.message}. Đang thử lại... (${retryCount}/${MAX_RETRIES})`, 'error');
-                    setTimeout(() => loadMod(button), 1000);
-                } else {
-                    setStatus(`Không thể load mod sau ${MAX_RETRIES} lần thử. Lỗi: ${error.message}`, 'error');
-                    button.disabled = false;
-                }
+                button.disabled = false;
             }
         }
 
-        // Xử lý khi trang web được load
+        // Khởi tạo khi trang load
         window.addEventListener('load', () => {
-            // Reset trạng thái
             isLoaded = false;
-            retryCount = 0;
-            setStatus('Sẵn sàng để load mod', 'normal');
+            setStatus('Sẵn sàng để load mod');
         });
-
-        // Xử lý khi có lỗi không mong muốn
-        window.onerror = function(msg, url, lineNo, columnNo, error) {
-            setStatus(`Lỗi không mong muốn: ${msg}`, 'error');
-            return false;
-        };
     </script>
 </body>
 </html>
