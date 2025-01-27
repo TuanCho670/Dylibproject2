@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alert Image Loader</title>
+    <title>Auto Tap Control</title>
     <style>
         body {
             background: #1a1a1a;
@@ -25,7 +25,13 @@
             margin-bottom: 20px;
             text-shadow: 0 0 10px rgba(0,255,149,0.5);
         }
-        .load-btn {
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .btn {
             background: linear-gradient(145deg, #232323, #1c1c1c);
             border: none;
             border-radius: 8px;
@@ -36,37 +42,47 @@
             transition: all 0.3s;
             box-shadow: 4px 4px 8px #161616, 
                        -4px -4px 8px #2a2a2a;
-            width: 200px;
-            margin: 10px auto;
-            display: block;
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
         }
-        .load-btn:active {
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn:active:not(:disabled) {
             box-shadow: inset 4px 4px 8px #161616, 
                        inset -4px -4px 8px #2a2a2a;
         }
-        .load-btn.active {
+        .btn.active {
             background: linear-gradient(145deg, #00cc78, #00995a);
         }
         .status {
             margin-top: 20px;
-            color: #666;
+            padding: 10px;
+            border-radius: 8px;
+            background: #2a2a2a;
             font-size: 14px;
             min-height: 20px;
         }
-        .error { color: #ff4444; }
-        .success { color: #00ff95; }
+        .status.error { color: #ff4444; }
+        .status.success { color: #00ff95; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="title">Image Mod Loader</div>
-        <button class="load-btn" onclick="loadMod(this)">LOAD MOD</button>
-        <div class="status" id="status"></div>
+        <div class="title">Auto Tap Control</div>
+        <div class="button-container">
+            <button class="btn" onclick="loadMod(this)" id="loadBtn">LOAD MOD</button>
+            <button class="btn" onclick="toggleAutoTap(this)" id="autoTapBtn" disabled>BẬT AUTO TAP</button>
+        </div>
+        <div class="status" id="status">Chưa load mod</div>
     </div>
 
     <script>
-        let myAlert = null;
+        let myPlugin = null;
         let isLoaded = false;
+        let isAutoTapRunning = false;
 
         function setStatus(text, type = 'normal') {
             const statusEl = document.getElementById('status');
@@ -75,44 +91,64 @@
         }
 
         function loadMod(button) {
-            if (isLoaded) {
-                setStatus('Mod đã được load rồi!', 'success');
+            if (typeof h5gg === 'undefined') {
+                setStatus('H5GG không tìm thấy!', 'error');
                 return;
             }
 
-            try {
-                // Kiểm tra h5gg
-                if (typeof h5gg === 'undefined') {
-                    throw new Error('H5GG không tìm thấy!');
+            if (!isLoaded) {
+                try {
+                    h5gg.require(7.8);
+                    myPlugin = h5gg.loadPlugin("MyPlugin", "Alert.dylib");
+                    
+                    if (!myPlugin) {
+                        setStatus("Không thể load plugin!", 'error');
+                        return;
+                    }
+
+                    // Hiển thị thông báo
+                    myPlugin.showNotification();
+
+                    button.classList.add('active');
+                    button.textContent = 'ĐÃ LOAD';
+                    document.getElementById('autoTapBtn').disabled = false;
+                    setStatus('Mod đã được load thành công!', 'success');
+                    isLoaded = true;
+
+                } catch (e) {
+                    setStatus('Lỗi: ' + e.message, 'error');
+                    console.error(e);
                 }
-
-                // Kiểm tra version
-                h5gg.require(7.8);
-
-                // Load plugin
-                myAlert = h5gg.loadPlugin("MyAlert", "Alert.dylib");
-                
-                if (!myAlert) {
-                    throw new Error('Không thể load plugin!');
-                }
-
-                // Đánh dấu đã load thành công
-                button.classList.add('active');
-                button.textContent = 'ĐÃ LOAD';
-                setStatus('Mod đã được load thành công!', 'success');
-                isLoaded = true;
-
-            } catch (error) {
-                setStatus('Lỗi: ' + error.message, 'error');
-                console.error('Lỗi:', error);
-                button.disabled = false;
             }
         }
 
-        // Khởi tạo khi trang load
+        function toggleAutoTap(button) {
+            if (!isLoaded || !myPlugin) {
+                setStatus('Vui lòng load mod trước!', 'error');
+                return;
+            }
+
+            if (!isAutoTapRunning) {
+                myPlugin.startAutoTap();
+                button.textContent = 'TẮT AUTO TAP';
+                button.classList.add('active');
+                setStatus('Auto Tap đang chạy...', 'success');
+                isAutoTapRunning = true;
+            } else {
+                myPlugin.stopAutoTap();
+                button.textContent = 'BẬT AUTO TAP';
+                button.classList.remove('active');
+                setStatus('Auto Tap đã dừng', 'normal');
+                isAutoTapRunning = false;
+            }
+        }
+
+        // Khởi tạo
         window.addEventListener('load', () => {
             isLoaded = false;
-            setStatus('Sẵn sàng để load mod');
+            isAutoTapRunning = false;
+            document.getElementById('autoTapBtn').disabled = true;
+            setStatus('Chưa load mod');
         });
     </script>
 </body>
