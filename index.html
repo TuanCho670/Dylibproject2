@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Tap Control</title>
+    <title>Auto Tap Control V2</title>
     <style>
         body {
             background: #1a1a1a;
@@ -71,7 +71,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="title">Auto Tap Control</div>
+        <div class="title">Auto Tap Control V2</div>
         <div class="button-container">
             <button class="btn" onclick="loadMod(this)" id="loadBtn">LOAD MOD</button>
             <button class="btn" onclick="toggleAutoTap(this)" id="autoTapBtn" disabled>BẬT AUTO TAP</button>
@@ -80,91 +80,104 @@
     </div>
 
     <script>
-       let myPlugin = null;
-let isLoaded = false;
-let isAutoTapRunning = false;
+        let myPlugin = null;
+        let isLoaded = false;
+        let isAutoTapRunning = false;
 
-function setStatus(text, type = 'normal') {
-    const statusEl = document.getElementById('status');
-    statusEl.textContent = text;
-    statusEl.className = 'status ' + type;
-}
+        function setStatus(text, type = 'normal') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = text;
+            statusEl.className = 'status ' + type;
+        }
 
-function loadMod(button) {
-    if (typeof h5gg === 'undefined') {
-        setStatus('H5GG không tìm thấy!', 'error');
-        alert('Lỗi: H5GG không tìm thấy!');
-        return;
-    }
-
-    if (!isLoaded) {
-        try {
-            h5gg.require(7.8);
-            myPlugin = h5gg.loadPlugin("AutoTouch", "Alert.dylib");
-            
-            if (!myPlugin) {
-                setStatus("Không thể load plugin!", 'error');
-                alert('Lỗi: Không thể load plugin!');
+        function loadMod(button) {
+            if (typeof h5gg === 'undefined') {
+                setStatus('H5GG không tìm thấy!', 'error');
+                alert('Lỗi: H5GG không tìm thấy!');
                 return;
             }
 
-            // Đăng ký callbacks cho alert
-            myPlugin.autoTouchDidConfirmAlert = function() {
-                button.classList.add('active');
-                button.textContent = 'ĐÃ LOAD';
-                document.getElementById('autoTapBtn').disabled = false;
-                setStatus('Mod đã được load thành công!', 'success');
-                isLoaded = true;
-            };
+            if (!isLoaded) {
+                try {
+                    h5gg.require(7.8);
+                    // Thay đổi tên plugin và file dylib
+                    myPlugin = h5gg.loadPlugin("AutoTouch", "Alert.dylib");
+                    
+                    if (!myPlugin) {
+                        setStatus("Không thể load plugin!", 'error');
+                        alert('Lỗi: Không thể load plugin!');
+                        return;
+                    }
 
-            myPlugin.autoTouchDidCancelAlert = function() {
-                setStatus('Người dùng đã hủy load mod', 'normal');
-                button.textContent = 'LOAD MOD';
-                isLoaded = false;
-            };
+                    // Đăng ký callbacks cho alert
+                    myPlugin.autoTouchDidConfirmAlert = function() {
+                        button.classList.add('active');
+                        button.textContent = 'ĐÃ LOAD';
+                        document.getElementById('autoTapBtn').disabled = false;
+                        setStatus('Mod đã được load thành công!', 'success');
+                        isLoaded = true;
+                    };
 
-            // Hiển thị thông báo
-            myPlugin.showNotification();
+                    myPlugin.autoTouchDidCancelAlert = function() {
+                        setStatus('Người dùng đã hủy load mod', 'normal');
+                        button.textContent = 'LOAD MOD';
+                        isLoaded = false;
+                    };
 
-        } catch (e) {
-            setStatus('Lỗi: ' + e.message, 'error');
-            alert('Lỗi: ' + e.message);
-            console.error(e);
+                    // Hiển thị thông báo
+                    myPlugin.showNotification();
+
+                } catch (e) {
+                    setStatus('Lỗi: ' + e.message, 'error');
+                    alert('Lỗi: ' + e.message);
+                    console.error(e);
+                }
+            }
         }
-    }
-}
 
-function toggleAutoTap(button) {
-    if (!isLoaded || !myPlugin) {
-        setStatus('Vui lòng load mod trước!', 'error');
-        alert('Vui lòng load mod trước!');
-        return;
-    }
+        function toggleAutoTap(button) {
+            if (!isLoaded || !myPlugin) {
+                setStatus('Vui lòng load mod trước!', 'error');
+                alert('Vui lòng load mod trước!');
+                return;
+            }
 
-    if (!isAutoTapRunning) {
-        myPlugin.startAutoTouch();
-        button.textContent = 'TẮT AUTO TAP';
-        button.classList.add('active');
-        setStatus('Auto Tap đang chạy...', 'success');
-        alert('Auto Tap đã được bật!');
-        isAutoTapRunning = true;
-    } else {
-        myPlugin.stopAutoTouch();
-        button.textContent = 'BẬT AUTO TAP';
-        button.classList.remove('active');
-        setStatus('Auto Tap đã dừng', 'normal');
-        alert('Auto Tap đã được tắt!');
-        isAutoTapRunning = false;
-    }
-}
+            if (!isAutoTapRunning) {
+                try {
+                    myPlugin.startAutoTouch(); // Đổi tên method thành startAutoTouch
+                    button.textContent = 'TẮT AUTO TAP';
+                    button.classList.add('active');
+                    setStatus('Auto Tap đang chạy...', 'success');
+                    alert('Auto Tap đã được bật!');
+                    isAutoTapRunning = true;
+                } catch (e) {
+                    setStatus('Lỗi khi bật Auto Tap: ' + e.message, 'error');
+                    alert('Lỗi khi bật Auto Tap: ' + e.message);
+                    console.error(e);
+                }
+            } else {
+                try {
+                    myPlugin.stopAutoTouch(); // Đổi tên method thành stopAutoTouch
+                    button.textContent = 'BẬT AUTO TAP';
+                    button.classList.remove('active');
+                    setStatus('Auto Tap đã dừng', 'normal');
+                    alert('Auto Tap đã được tắt!');
+                    isAutoTapRunning = false;
+                } catch (e) {
+                    setStatus('Lỗi khi tắt Auto Tap: ' + e.message, 'error');
+                    alert('Lỗi khi tắt Auto Tap: ' + e.message);
+                    console.error(e);
+                }
+            }
+        }
 
-// Khởi tạo
-window.addEventListener('load', () => {
-    isLoaded = false;
-    isAutoTapRunning = false;
-    document.getElementById('autoTapBtn').disabled = true;
-    setStatus('Chưa load mod');
-});
+        // Khởi tạo
+        window.addEventListener('load', () => {
+            isLoaded = false;
+            isAutoTapRunning = false;
+            document.getElementById('autoTapBtn').disabled = true;
+            setStatus('Chưa load mod');
+        });
     </script>
 </body>
 </html>
