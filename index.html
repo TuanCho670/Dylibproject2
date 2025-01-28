@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Tap Control V2</title>
+    <title>Auto Tap Control V3</title>
     <style>
         body {
             background: #1a1a1a;
@@ -74,7 +74,7 @@
         <div class="title">Auto Tap Control V2</div>
         <div class="button-container">
             <button class="btn" onclick="loadMod(this)" id="loadBtn">LOAD MOD</button>
-            <button class="btn" onclick="toggleAutoTap(this)" id="autoTapBtn" disabled>BẬT AUTO TAP</button>
+            <button class="btn" onclick="toggleAutoTap(this)" id="autoTapBtn">BẬT AUTO TAP</button>
         </div>
         <div class="status" id="status">Chưa load mod</div>
     </div>
@@ -172,12 +172,13 @@
         }
 
         // Khởi tạo
-        window.addEventListener('load', () => {
-            isLoaded = false;
-            isAutoTapRunning = false;
-            document.getElementById('autoTapBtn').disabled = true;
-            setStatus('Chưa load mod');
-        });
+window.addEventListener('load', () => {
+    isLoaded = false;
+    isAutoTapRunning = false;
+    // Xóa hoặc comment dòng này
+    // document.getElementById('autoTapBtn').disabled = true;
+    setStatus('Chưa load mod');
+});
     </script>
 </body>
 </html>
